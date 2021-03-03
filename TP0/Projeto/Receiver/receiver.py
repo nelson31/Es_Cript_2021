@@ -2,6 +2,7 @@ import socket
 
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5005
+SOCKET_READ_BLOCK_LEN = 4096  # bytes
 
 
 def communicate():
@@ -11,7 +12,7 @@ def communicate():
     sock.bind((UDP_IP, UDP_PORT))
 
     while True:
-        data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
+        data, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
         print("received from ", str(addr[0]), " message: ", data)
 
 
