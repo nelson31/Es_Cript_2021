@@ -24,6 +24,12 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\nelso\Desktop\Universidade\Estruturas Criptograficas\TP0\Projeto\Receiver" />
+      <recent name="C:\Users\nelso\Desktop\Universidade\Estruturas Criptograficas\TP0\Projeto\Emitter" />
+    </key>
+  </component>
   <component name="RunManager" selected="Python.emitter">
     <configuration name="emitter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Projeto" />
@@ -37,7 +43,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/emitter.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\nelso\Desktop\Universidade\Estruturas Criptograficas\TP0\Projeto\Emitter\emitter.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -79,7 +85,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/receiver.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\nelso\Desktop\Universidade\Estruturas Criptograficas\TP0\Projeto\Receiver\receiver.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
