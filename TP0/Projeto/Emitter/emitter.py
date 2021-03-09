@@ -84,21 +84,24 @@ async def validateKey(sock):
     if len(pw) > 0:
         # Derivar a chave
         key = await derivationKey(pw.encode("utf-8"))
-        # Enviar o salt ao receiver
-        sock.sendto(salt, (UDP_IP, UDP_PORT))
+        # Autenticar a chave com a propria chave
+        keyA = await authData(key)
+        # Enviar o salt e o MAC(key) ao receiver
+        sock.sendto(salt + keyA, (UDP_IP, UDP_PORT))
         # Esperar a resposta
-        key2, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
-        # Comparar se a resposta é igual à chave
+        response, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
+        # Se o Receiver nao ter verificado que as chaves são iguais
+        if response == b"Invalido":
+            sock.close()
+            print("The receiver does not confirm the key!!")
+            sys.exit(0)
+        # Comparar se a resposta é mesmo igual à chave
         try:
-            await verifyKey(key2, key)
+            await verifyKey(response, key)
         except InvalidSignature as e:
             print("The key sent by the receiver does not match: %s" % e)
             sock.sendto(b"Invalido", (UDP_IP, UDP_PORT))
             sys.exit(0)
-        # Autenticar a chave com a propria chave
-        keyA = await authData(key)
-        # Enviar a chave que foi gerada
-        sock.sendto(keyA, (addr[0], addr[1]))
     else:
         sock.close()
         sys.exit(0)
@@ -114,22 +117,16 @@ async def communicate():
     # Validar as chaves que foram geradas tanto pelo Emitter como o Receiver
     key = await validateKey(sock)
 
-    # Esperar pela resposta do receiver
-    data, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
-    if data == await authData(b"Valido"):
-        print("Fase de validação da chave terminada com sucesso!!\n")
-        # Efetuar a comunicacao entre as partes
-        pt = input("Client message: ")
-        if len(pt) > 0:
-            # Enviar a mensagem
-            sock.sendto(nonce + await cifra(key, pt.encode("utf-8")), (UDP_IP, UDP_PORT))
-            # Receber a resposta do receiver
-            data, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
-            print("Resposta do Receiver: " + (await decifra(key, data)).decode("utf-8"))
-        else:
-            sock.close()
+    # Efetuar a comunicacao entre as partes
+    pt = input("Emitter message: ")
+    if len(pt) > 0:
+        # Enviar a mensagem
+        sock.sendto(nonce + await cifra(key, pt.encode("utf-8")), (UDP_IP, UDP_PORT))
+        # Receber a resposta do receiver
+        data, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
+        print("Resposta do Receiver: " + (await decifra(key, data)).decode("utf-8"))
     else:
-        print("Fase de validação da chave terminada com insucesso!!\n")
+        sock.close()
 
 
 async def main():

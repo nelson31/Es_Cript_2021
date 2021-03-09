@@ -52,23 +52,22 @@ async def validateKey(sock):
     pw = input("Introduza a password: ")
     if len(pw) > 0:
         # Esperar pelo salt
-        salt, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
+        data, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
+        salt = data[0:16]
+        key1A = data[16:len(data)]
         # Gerar a chave
         key = await derivationKey(pw.encode("utf-8"), salt)
-        # Autenticar a chave com a propria chave
-        keyA = await authData(key)
-        # Enviar a chave que foi gerada
-        sock.sendto(keyA, (addr[0], addr[1]))
-        # Esperar pela chave que o emmiter gerou
-        key1, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
-        # Verificar que key1 == MAC(key2)
+        # Verificar se o Mac enviado pelo emitter corresponde ao mac da chave gerada
         try:
-            await verifyKey(key1, key)
-            sock.sendto(await authData(b"Valido"), (addr[0], addr[1]))
+            await verifyKey(key1A, key)
         except InvalidSignature as e:
             print("The key sent by the emitter does not match: %s" % e)
-            sock.sendto(await authData(b"Invalido"), (addr[0], addr[1]))
+            sock.sendto(b"Invalido", (addr[0], addr[1]))
             sys.exit(0)
+        # Autenticar a chave com a propria chave
+        key2A = await authData(key)
+        # Enviar o mac da chave que foi gerada
+        sock.sendto(key2A, (addr[0], addr[1]))
     else:
         sock.close()
         sys.exit(0)
@@ -112,9 +111,14 @@ async def communicate():
 
     # Receber a mensagem
     data, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
+    # Caso a mensagem enviada seja a dizer que o emmiter nao verificou as chaves
+    if data == b"Invalido":
+        sock.close()
+        print("The emitter does not verify the keys!!")
+        sys.exit(0)
     nonce = data[0:12]
     crypto = data[12:len(data)]
-    print("Recebida de ", str(addr[0]), " a mensagem: ", (await decifra(key, crypto, nonce)).decode("utf-8"))
+    print("Recebida do Emitter com endereço ", str(addr[0]), " a mensagem: ", (await decifra(key, crypto, nonce)).decode("utf-8"))
 
     # Enviar resposta
     sock.sendto(await cifra(key, b"Mensagem recebida", nonce), (addr[0], addr[1]))
