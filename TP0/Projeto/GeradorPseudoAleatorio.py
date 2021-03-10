@@ -5,8 +5,6 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 # Tamanho do bloco em bytes(64 bits)
 SIZE_BLOCK = 8
-# Parametro n para a decisão de quantas palavras se deve gerar (2^n)
-PARAM_N = 1
 
 ''' 
     Funcao usada para derivar uma chave
@@ -32,9 +30,9 @@ a ser utilizada para cifrar os dados
 '''
 
 
-def gerador(seed):
+def gerador(seed, param_n):
     # A sequencia de palavras tem de ter tamanho suficiente para as 2^n palavras
-    digest = hashes.Hash(hashes.SHAKE256(SIZE_BLOCK * (2 ** PARAM_N)))
+    digest = hashes.Hash(hashes.SHAKE256(SIZE_BLOCK * (2 ** param_n)))
     digest.update(seed)
     return digest.finalize()
 
@@ -44,12 +42,12 @@ Método que permite gerar as 2**N words de 64 bits
 '''
 
 
-def generateRandomWords(key):
+def generateRandomWords(key, param_n):
     # Sequencia aleatoria gerada pelo gerador
-    s = gerador(key)
+    s = gerador(key,param_n)
     # Criar as palavras como long integers
     blocos = []
-    for i in range(2 ** PARAM_N):
+    for i in range(2 ** param_n):
         blocos.append(s[i * SIZE_BLOCK:i * SIZE_BLOCK + SIZE_BLOCK])
     return blocos
 
@@ -66,9 +64,10 @@ class GeradorPseudoAleatorio:
     Construtor para objeto da classe GeradorPseudoAleatorio
     """
 
-    def __init__(self, password):
+    def __init__(self, password, param_n):
         self.key = derivationKey(password)
-        self.words = generateRandomWords(self.key)
+        self.words = generateRandomWords(self.key,param_n)
+        self.param_n = param_n
 
     ''' 
     Método que permite cifrar uma mensagem 

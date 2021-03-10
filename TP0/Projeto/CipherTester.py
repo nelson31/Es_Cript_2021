@@ -1,18 +1,23 @@
 import GeradorPseudoAleatorio
+import os
 
 ''' 
-Parâmetro que guarda o número de palavras 
-de 64 bits geradas o prng
+Parâmetro N usado para especificar o numero de 
+palavras a serem geradas pelo prng
 '''
-N = 2
+N = 10
 
 def main():
-    pwd = input("Inserir password: ")
+    print('Welcome to our cipher test!! (All rights reserved)')
+
+    pwd = input('Introduza a password usada para a derivação da chave da cifra: ')
     gpa = GeradorPseudoAleatorio.GeradorPseudoAleatorio(pwd.encode("utf-8"), N)
     # print(str(gpa.getNumWords()) + ' Words found')
 
-    plaintext = b"Esta mensagem e secreta.......:)" # Esta mensagem contém exatamente 32 bytes
+    plaintext = os.urandom(2 ** N)  # Esta mensagem contém exatamente 32 bytes
     print(b"Mensagem a cifrar: " + plaintext)
+
+    print('> Iniciado processo de cifragem usando a nossa cifra...')
     ciphertext = gpa.cifrar(plaintext)
     print(b"Ciphertext gerado: " + ciphertext)
     decipheredtext = gpa.decifrar(ciphertext)
