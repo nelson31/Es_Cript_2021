@@ -2,53 +2,62 @@ import GeradorPseudoAleatorio
 import os
 import timeit
 
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from Emitter.emitter import cifraGCM
+from Emitter.emitter import decifraGCM
+from Emitter.emitter import derivationKey
 
 ''' 
 Parâmetro N usado para especificar o numero de 
 palavras a serem geradas pelo prng
 '''
-N = 10
+N = 10  # Vamos ter sequencias de 1024 bytes
 
-HM = '''
+
 def homeMadeCipher():
-    pwd = miguel
+    pwd = "miguel"
     plaintext = os.urandom(2 ** N)
     gpa = GeradorPseudoAleatorio.GeradorPseudoAleatorio(pwd.encode("utf-8"), N)
     ciphertext = gpa.cifrar(plaintext)
-    decipheredtext = gpa.decifrar(ciphertext)
-    print('cu')
+    print(ciphertext)
+    print(plaintext == gpa.decifrar(ciphertext))
+
+
+def aesgcmCipher():
+    pwd = "nelson"
+    key = derivationKey(pwd.encode("utf-8"))
+    nonce = os.urandom(12)
+    plaintext = os.urandom(2 ** N)
+    ciphertext = cifraGCM(key, plaintext, nonce)
+    print(ciphertext)
+    print(plaintext == decifraGCM(key, ciphertext, nonce))
+
+
+HM = '''
+homeMadeCipher()
 '''
 
 AESGCMM = '''
-def aesgcmCipher():
-    key = os.urandom(32)
-    nonce = os.urandom(12)
-    aesgcm = AESGCM(key)
-    plaintext = os.urandom(2 ** N)
-    ciphertext = aesgcm.encrypt(nonce, plaintext.encode("utf-8"))
+aesgcmCipher()
 '''
 
 setup = '''
-import GeradorPseudoAleatorio
-import os
-import timeit
-
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from __main__ import homeMadeCipher
+from __main__ import aesgcmCipher
 '''
 
 
 def main():
     print('> Iniciado processo de cifragem usando a nossa cifra...')
-    timeHM = timeit.timeit(stmt=HM, number=10, setup=setup)
+    timeHM = timeit.timeit(stmt=HM, number=1, setup=setup)
     print("Done.")
 
     print('> Iniciado processo de cifragem usando a cifra AESGCM...')
-    timeAESGCM = timeit.timeit(stmt=AESGCMM, number=10, setup=setup)
+    timeAESGCM = timeit.timeit(stmt=AESGCMM, number=1, setup=setup)
     print("Done.")
 
-    print("Home made: " + str(timeHM) + "\n")
-    print("AESGCM: " + str(timeAESGCM) + "\n")
+    print("\n[TIMES]")
+    print("Home made: " + str(timeHM))
+    print("AESGCM: " + str(timeAESGCM))
 
 
 if __name__ == "__main__":

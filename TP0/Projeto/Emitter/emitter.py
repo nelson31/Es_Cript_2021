@@ -15,15 +15,13 @@ ASSOCIATED_DATA = b"Exemplo de Associated Data para o TP0 de EC"
 
 # Geracao do salt para a derivacao da chave
 salt = os.urandom(16)
-# Nonce usado para cifrar a mensagem
-nonce = os.urandom(12)
 
 ''' 
 Funcao usada para derivar uma chave
 '''
 
 
-async def derivationKey(password):
+def derivationKey(password):
     info = None
     hkdf = HKDF(
         hashes.SHA256(),
@@ -39,14 +37,14 @@ Funcao que serve para verificar a chave que foi recebida pelo receiver
 '''
 
 
-async def verifyKey(key2, key):
+def verifyKey(key2, key):
     h = hmac.HMAC(key, hashes.SHA256())
     h.update(key)
     h.verify(key2)
 
 
 # Serve para autenticar a chave
-async def authData(key2):
+def authData(key2):
     h = hmac.HMAC(key2, hashes.SHA256())
     h.update(key2)
     return h.finalize()
@@ -57,19 +55,20 @@ Funcao usada para cifrar e autenticar a mensagem
 '''
 
 
-async def cifra(key, mensagem):
+def cifraGCM(key, mensagem, nonce):
     aesgcm = AESGCM(key)
 
     ct = aesgcm.encrypt(nonce, mensagem, ASSOCIATED_DATA)
 
     return ct
 
+
 '''
 Funcao usada para decifrar e autenticar a mensagem
 '''
 
 
-async def decifra(key, criptograma):
+def decifraGCM(key, criptograma, nonce):
     aesgcm = AESGCM(key)
 
     msg = aesgcm.decrypt(nonce, criptograma, ASSOCIATED_DATA)
@@ -78,14 +77,14 @@ async def decifra(key, criptograma):
 
 
 # Funcao que serve para validar a chave entre o Emitter e o Receiver
-async def validateKey(sock):
+def validateKey(sock):
     # Acordar uma chave a ser usada na comunicação
     pw = input("Introduza a password: ")
     if len(pw) > 0:
         # Derivar a chave
-        key = await derivationKey(pw.encode("utf-8"))
+        key = derivationKey(pw.encode("utf-8"))
         # Autenticar a chave com a propria chave
-        keyA = await authData(key)
+        keyA = authData(key)
         # Enviar o salt e o MAC(key) ao receiver
         sock.sendto(salt + keyA, (UDP_IP, UDP_PORT))
         # Esperar a resposta
@@ -97,7 +96,7 @@ async def validateKey(sock):
             sys.exit(0)
         # Comparar se a resposta é mesmo igual à chave
         try:
-            await verifyKey(response, key)
+            verifyKey(response, key)
         except InvalidSignature as e:
             print("The key sent by the receiver does not match: %s" % e)
             sock.sendto(b"Invalido", (UDP_IP, UDP_PORT))
@@ -110,29 +109,33 @@ async def validateKey(sock):
 
 
 # Funcao que serve para dar inicio à comunicação entre o Emitter<->Receiver
-async def communicate():
+def communicate():
     sock = socket.socket(socket.AF_INET,  # Internet
                          socket.SOCK_DGRAM)  # UDP
 
     # Validar as chaves que foram geradas tanto pelo Emitter como o Receiver
-    key = await validateKey(sock)
+    key = validateKey(sock)
 
     # Efetuar a comunicacao entre as partes
     pt = input("Emitter message: ")
     if len(pt) > 0:
+        # Nonce usado para cifrar a mensagem
+        nonce = os.urandom(12)
         # Enviar a mensagem
-        sock.sendto(nonce + await cifra(key, pt.encode("utf-8")), (UDP_IP, UDP_PORT))
+        sock.sendto(nonce + cifraGCM(key, pt.encode("utf-8"), nonce), (UDP_IP, UDP_PORT))
         # Receber a resposta do receiver
         data, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
-        print("Resposta do Receiver: " + (await decifra(key, data)).decode("utf-8"))
+        nonce = data[0:12]
+        crypto = data[12:len(data)]
+        print("Resposta do Receiver: " + (decifraGCM(key, crypto, nonce)).decode("utf-8"))
     else:
         sock.close()
 
 
-async def main():
-    await communicate()
+def main():
+    communicate()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    res = asyncio.get_event_loop().run_until_complete(main())
+    main()

@@ -5,7 +5,8 @@ import os
 Parâmetro N usado para especificar o numero de 
 palavras a serem geradas pelo prng
 '''
-N = 10
+N = 5
+
 
 def main():
     print('Welcome to our cipher test!! (All rights reserved)')

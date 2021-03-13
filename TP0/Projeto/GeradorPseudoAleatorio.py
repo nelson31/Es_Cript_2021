@@ -44,7 +44,7 @@ Método que permite gerar as 2**N words de 64 bits
 
 def generateRandomWords(key, param_n):
     # Sequencia aleatoria gerada pelo gerador
-    s = gerador(key,param_n)
+    s = gerador(key, param_n)
     # Criar as palavras como long integers
     blocos = []
     for i in range(2 ** param_n):
@@ -66,7 +66,7 @@ class GeradorPseudoAleatorio:
 
     def __init__(self, password, param_n):
         self.key = derivationKey(password)
-        self.words = generateRandomWords(self.key,param_n)
+        self.words = generateRandomWords(self.key, param_n)
         self.param_n = param_n
 
     ''' 

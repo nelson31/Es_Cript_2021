@@ -1,3 +1,4 @@
+import os
 import socket
 import asyncio
 import sys
@@ -17,7 +18,7 @@ Funcao usada para derivar uma chave
 '''
 
 
-async def derivationKey(password, salt):
+def derivationKey(password, salt):
     info = None
     hkdf = HKDF(
         hashes.SHA256(),
@@ -33,21 +34,21 @@ Funcao que serve para verificar a chave que foi recebida pelo receiver
 '''
 
 
-async def verifyKey(key1, key):
+def verifyKey(key1, key):
     h = hmac.HMAC(key, hashes.SHA256())
     h.update(key)
     h.verify(key1)
 
 
 # Serve para autenticar a chave
-async def authData(key2):
+def authData(key2):
     h = hmac.HMAC(key2, hashes.SHA256())
     h.update(key2)
     return h.finalize()
 
 
 # Funcao que serve para validar a chave entre o Emitter e o Receiver
-async def validateKey(sock):
+def validateKey(sock):
     # Acordar uma chave a ser usada na comunicação
     pw = input("Introduza a password: ")
     if len(pw) > 0:
@@ -56,16 +57,16 @@ async def validateKey(sock):
         salt = data[0:16]
         key1A = data[16:len(data)]
         # Gerar a chave
-        key = await derivationKey(pw.encode("utf-8"), salt)
+        key = derivationKey(pw.encode("utf-8"), salt)
         # Verificar se o Mac enviado pelo emitter corresponde ao mac da chave gerada
         try:
-            await verifyKey(key1A, key)
+            verifyKey(key1A, key)
         except InvalidSignature as e:
             print("The key sent by the emitter does not match: %s" % e)
             sock.sendto(b"Invalido", (addr[0], addr[1]))
             sys.exit(0)
         # Autenticar a chave com a propria chave
-        key2A = await authData(key)
+        key2A = authData(key)
         # Enviar o mac da chave que foi gerada
         sock.sendto(key2A, (addr[0], addr[1]))
     else:
@@ -74,24 +75,26 @@ async def validateKey(sock):
 
     return key
 
+
 '''
 Funcao usada para cifrar e autenticar a mensagem
 '''
 
 
-async def cifra(key, mensagem, nonce):
+def cifraGCM(key, mensagem, nonce):
     aesgcm = AESGCM(key)
 
     ct = aesgcm.encrypt(nonce, mensagem, ASSOCIATED_DATA)
 
     return ct
 
+
 '''
 Funcao usada para decifrar e autenticar a mensagem
 '''
 
 
-async def decifra(key, criptograma, nonce):
+def decifraGCM(key, criptograma, nonce):
     aesgcm = AESGCM(key)
 
     msg = aesgcm.decrypt(nonce, criptograma, ASSOCIATED_DATA)
@@ -100,14 +103,14 @@ async def decifra(key, criptograma, nonce):
 
 
 # Funcao que serve para dar inicio à comunicação entre o Emitter<->Receiver
-async def communicate():
+def communicate():
     sock = socket.socket(socket.AF_INET,  # Internet
                          socket.SOCK_DGRAM)  # UDP
 
     sock.bind((UDP_IP, UDP_PORT))
 
     # Validar as chaves que foram geradas tanto pelo Emitter como o Receiver
-    key = await validateKey(sock)
+    key = validateKey(sock)
 
     # Receber a mensagem
     data, addr = sock.recvfrom(SOCKET_READ_BLOCK_LEN)
@@ -118,18 +121,21 @@ async def communicate():
         sys.exit(0)
     nonce = data[0:12]
     crypto = data[12:len(data)]
-    print("Recebida do Emitter com endereço ", str(addr[0]), " a mensagem: ", (await decifra(key, crypto, nonce)).decode("utf-8"))
+    print("Recebida do Emitter com endereço ", str(addr[0]), " a mensagem: ",
+          (decifraGCM(key, crypto, nonce)).decode("utf-8"))
 
+    # Nonce usado para cifrar a mensagem
+    nonce = os.urandom(12)
     # Enviar resposta
-    sock.sendto(await cifra(key, b"Mensagem recebida", nonce), (addr[0], addr[1]))
+    sock.sendto(nonce + cifraGCM(key, b"Mensagem recebida", nonce), (addr[0], addr[1]))
 
     sock.close()
 
 
-async def main():
-    await communicate()
+def main():
+    communicate()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    res = asyncio.get_event_loop().run_until_complete(main())
+    main()
