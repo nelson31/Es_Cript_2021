@@ -31,7 +31,7 @@
       <recent name="C:\Users\nelso\Desktop\Universidade\Estruturas Criptograficas\TP0\Projeto\Emitter" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.emitter">
+  <component name="RunManager" selected="Python.CipherTimesTester">
     <configuration name="CipherTester" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Projeto" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -53,7 +53,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="GeradorPseudoAleatorio" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="CipherTimesTester" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Projeto" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -65,7 +65,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GeradorPseudoAleatorio.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CipherTimesTester.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -160,11 +160,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.CipherTimesTester" />
         <item itemvalue="Python.emitter" />
         <item itemvalue="Python.receiver" />
         <item itemvalue="Python.CipherTester" />
         <item itemvalue="Python.TestGenerator" />
-        <item itemvalue="Python.GeradorPseudoAleatorio" />
       </list>
     </recent_temporary>
   </component>

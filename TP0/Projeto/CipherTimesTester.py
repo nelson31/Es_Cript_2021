@@ -48,11 +48,11 @@ from __main__ import aesgcmCipher
 
 def main():
     print('> Iniciado processo de cifragem usando a nossa cifra...')
-    timeHM = timeit.timeit(stmt=HM, number=1, setup=setup)
+    timeHM = timeit.timeit(stmt=HM, number=100, setup=setup)
     print("Done.")
 
     print('> Iniciado processo de cifragem usando a cifra AESGCM...')
-    timeAESGCM = timeit.timeit(stmt=AESGCMM, number=1, setup=setup)
+    timeAESGCM = timeit.timeit(stmt=AESGCMM, number=100, setup=setup)
     print("Done.")
 
     print("\n[TIMES]")
