@@ -15,7 +15,8 @@
         1. O gerador deve poder gerar até um limite de $2^n$ palavras ($n$ é um parâmetro) armazenados em long integers do Python.
         2. A “seed” do gerador funciona como “password”
     2. Defina os algoritmos de cifrar e decifrar : para cifrar/decifrar uma mensagem com blocos de 64 bits, os “outputs” do gerador são usados como máscaras XOR dos blocos da mensagem. 
-| Essencialmente a cifra é uma implementação do  “One Time Pad” ou “cifra de Vernam”. |
+
+    > Essencialmente a cifra é uma implementação do  “One Time Pad” ou “cifra de Vernam”.
 
     3. Compare experimentalmente a eficiência dessa cifra com a da cifra usada no problema 1.
 
