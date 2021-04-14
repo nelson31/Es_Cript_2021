@@ -30,7 +30,7 @@ Implemente os seguintes esquemas **KEM** em classes *Python/SageMath* apresentan
     3. [DILITHYM](https://pq-crystals.org/dilithium/) - website
     4. [Rainbow](https://www.pqcrainbow.org/) - website
 3. [Notebooks vários](https://www.dropbox.com/sh/hsjcb8gfzrr6usp/AAAz-lekJK75IeeVNC8zYseya?dl=0)
-        1. Uma implementação simples do NTRU na versão Silverman 2015
-        2. Uma implementação do Number Theoretic Transform (NTT) adequada a protótipos para a família RLWE: por exemplo,  o NewHope ou o qTESLA
+    1. Uma implementação simples do NTRU na versão Silverman 2015
+    2. Uma implementação do Number Theoretic Transform (NTT) adequada a protótipos para a família RLWE: por exemplo,  o NewHope ou o qTESLA
 
 
