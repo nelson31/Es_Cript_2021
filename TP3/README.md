@@ -7,11 +7,11 @@
 Pretende-se implementar no **SageMath** protótipos de esquemas de assinatura digital  candidatos ao concurso NIST-PQC. 
 
 1. Implemente **um** dos esquemas “high algebra”  de assinaturas digitais da classe LWE.
-    a. [qTESLA](https://qtesla.org/)
-    b. [Dilithium/Crystalis](https://pq-crystals.org/dilithium/)
+    1. [qTESLA](https://qtesla.org/)
+    2. [Dilithium/Crystalis](https://pq-crystals.org/dilithium/)
 2. Implemente **um** dos esquemas de assinatura digital “low álgebra”
-    a. [SPHINCS+](https://sphincs.org/)
-    b. [Rainbow](https://www.pqcrainbow.org/)
+    1. [SPHINCS+](https://sphincs.org/)
+    2. [Rainbow](https://www.pqcrainbow.org/)
 
 
 
